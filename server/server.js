@@ -29,19 +29,19 @@ app.post('/', async (req, res)=>{
         const response = await openai.createCompletion({
             model: "text-davinci-003",
             prompt: `${prompt}`,
-            temperature: 0,
-            max_tokens: 3000,
+            temperature: 0.7,
+            max_tokens: 256,
             top_p: 1,
             frequency_penalty: 0.5,
             presence_penalty: 0,
         });
         res.status(200).send({
             bot: response.data.choices[0].text
-        })
+        });
     } catch (error) {
         console.log(error);
-        res.status(500).send({ error })
+        res.status(500).send(error || 'Something went wrong');
     }
 })
 
-app.listen(5000, ()=> console.log('Server is running on port http://localhost:5000'));
+app.listen(5000, ()=> console.log('AI Server is running on port http://localhost:5000'));

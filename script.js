@@ -15,7 +15,7 @@ function loader(element) {
         if (element.textContent === '....'){
             element.textContent = '';
         }
-    }, 300)
+    }, 300);
 }
 
 function typeText(element, text) {
@@ -28,7 +28,7 @@ function typeText(element, text) {
         } else {
             clearInterval(interval);
         }
-    }, 10)
+    }, 10);
 }
 
 function generateUniqueId() {
@@ -44,7 +44,7 @@ function chatStripe (isAi, value, uniqueId) {
         `
             <div class="wrapper ${isAi && 'ai'}">
                 <div class="chat" ">
-                    <div className="profile"> 
+                    <div class="profile"> 
                         <img src="${isAi ? bot : user}"  alt="${isAi ? 'bot' : 'user' }"/>
                     </div>
                     <div class="message" id="${uniqueId}">${value}</div>
@@ -73,6 +73,32 @@ const handleSubmit = async (e) => {
     const messageDiv = document.getElementById(uniqueId);
 
     loader(messageDiv);
+
+    // fetch data from server -> bots response
+
+    const response = await fetch('http://localhost:5000', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            prompt: data.get('prompt')
+        })
+    })
+    clearInterval(loadInterval);
+    messageDiv.innerHTML = "";
+
+    if(response.ok){
+        const data = await response.json();
+        const parsedData = data.bot.trim();
+
+        typeText(messageDiv, parsedData);
+    } else {
+        const err = await response.text();
+        messageDiv.innerHTML = "Something went wrong";
+
+        alert(err);
+    }
 }
 
 form.addEventListener('submit', handleSubmit);
